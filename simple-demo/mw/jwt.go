@@ -85,15 +85,6 @@ func InitJwt() {
 				model.Response
 				User model.User `json:"user"`
 			}
-			//if strings.Index(message, "Illegal format") != -1 {
-			//	c.JSON(http.StatusOK, UserResponse{
-			//		Response: model.Response{StatusCode: 1, StatusMsg: "用户名和密码长度不能超过32位且不能为空"},
-			//	})
-			//} else {
-			//	c.JSON(http.StatusOK, UserResponse{
-			//		Response: model.Response{StatusCode: 1, StatusMsg: "用户名或密码错误"},
-			//	})
-			//}
 			c.JSON(http.StatusOK, UserResponse{
 				Response: model.Response{StatusCode: 1, StatusMsg: message},
 			})
