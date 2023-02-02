@@ -2,34 +2,34 @@ package main
 
 import (
 	"github.com/RaymondCode/simple-demo/controller"
-	"github.com/gin-gonic/gin"
+	"github.com/RaymondCode/simple-demo/mw"
+	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
-func initRouter(r *gin.Engine) {
-	// public directory is used to serve static resources
+func initRouter(r *server.Hertz) {
 	r.Static("/static", "./public")
-
 	apiRouter := r.Group("/douyin")
-
 	// basic apis
 	apiRouter.GET("/feed/", controller.Feed)
-	apiRouter.GET("/user/", controller.UserInfo)
+	//apiRouter.GET("/user/", controller.UserInfo)
+	apiRouter.GET("/user/", mw.JwtMiddleware.MiddlewareFunc(), controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register)
-	apiRouter.POST("/user/login/", controller.Login)
-	apiRouter.POST("/publish/action/", controller.Publish)
-	apiRouter.GET("/publish/list/", controller.PublishList)
+	apiRouter.POST("/user/login/", mw.JwtMiddleware.LoginHandler)
+	apiRouter.POST("/publish/action/", mw.JwtMiddleware.MiddlewareFunc(), controller.Publish)
+	apiRouter.GET("/publish/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.PublishList)
 
 	// extra apis - I
-	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
-	apiRouter.GET("/favorite/list/", controller.FavoriteList)
-	apiRouter.POST("/comment/action/", controller.CommentAction)
-	apiRouter.GET("/comment/list/", controller.CommentList)
+	apiRouter.POST("/favorite/action/", mw.JwtMiddleware.MiddlewareFunc(), controller.FavoriteAction)
+	apiRouter.GET("/favorite/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.FavoriteList)
+	apiRouter.POST("/comment/action/", mw.JwtMiddleware.MiddlewareFunc(), controller.CommentAction)
+	apiRouter.GET("/comment/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.CommentList)
 
 	// extra apis - II
-	apiRouter.POST("/relation/action/", controller.RelationAction)
-	apiRouter.GET("/relation/follow/list/", controller.FollowList)
-	apiRouter.GET("/relation/follower/list/", controller.FollowerList)
-	apiRouter.GET("/relation/friend/list/", controller.FriendList)
-	apiRouter.GET("/message/chat/", controller.MessageChat)
-	apiRouter.POST("/message/action/", controller.MessageAction)
+	apiRouter.POST("/relation/action/", mw.JwtMiddleware.MiddlewareFunc(), controller.RelationAction)
+	apiRouter.GET("/relation/follow/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.FollowList)
+	apiRouter.GET("/relation/follower/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.FollowerList)
+	apiRouter.GET("/relation/friend/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.FriendList)
+	apiRouter.GET("/message/chat/", mw.JwtMiddleware.MiddlewareFunc(), controller.MessageChat)
+	apiRouter.POST("/message/action/", mw.JwtMiddleware.MiddlewareFunc(), controller.MessageAction)
+
 }
