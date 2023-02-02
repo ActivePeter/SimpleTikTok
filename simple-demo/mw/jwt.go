@@ -6,10 +6,10 @@ import (
 	"github.com/RaymondCode/simple-demo/dal/mysql"
 	"github.com/RaymondCode/simple-demo/model"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/hertz-contrib/jwt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -37,25 +37,32 @@ func InitJwt() {
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			var loginStruct struct {
-				Username string `form:"username" json:"username" query:"username" vd:"(len($) > 0 && len($) < 30); msg:'Illegal format'"`
-				Password string `form:"password" json:"password" query:"password" vd:"(len($) > 0 && len($) < 30); msg:'Illegal format'"`
+				Username string `form:"username" json:"username" query:"username" vd:"(len($) > 0 && len($) < 33); msg:'Illegal format'"`
+				Password string `form:"password" json:"password" query:"password" vd:"(len($) > 0 && len($) < 33); msg:'Illegal format'"`
 			}
 			if err := c.BindAndValidate(&loginStruct); err != nil {
-				return nil, err
+				return nil, errors.New("用户名和密码长度不能超过32位且不能为空")
 			}
-			users, err := mysql.CheckUser(loginStruct.Username, loginStruct.Password)
-			if err != nil {
-				return nil, jwt.ErrFailedAuthentication
+
+			if strings.Index(c.FullPath(), "login") != -1 { // 登陆
+				users, err := mysql.CheckUser(loginStruct.Username, loginStruct.Password) // 校验用户名和密码是否正确
+				if err != nil {
+					return nil, errors.New("用户名或密码错误！")
+				}
+				return users[0], nil
+			} else { // 注册
+				res, _ := mysql.FindUserByUsername(loginStruct.Username) // 校验用户名是否已经存在
+				if res > 0 {
+					return nil, errors.New("用户名已存在！")
+				}
+				user, _ := mysql.CreateUser(loginStruct.Username, loginStruct.Password)
+				return user, nil
 			}
-			if len(users) == 0 {
-				return nil, errors.New("user already exists or wrong password")
-			}
-			return users[0], nil
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
-			return &model.User{
+			return model.User{
 				Id:            int64(claims["Id"].(float64)),
 				Name:          claims["Name"].(string),
 				FollowCount:   int64(claims["FollowCount"].(float64)),
@@ -73,17 +80,22 @@ func InitJwt() {
 			}
 			return jwt.MapClaims{}
 		},
-		HTTPStatusMessageFunc: func(e error, ctx context.Context, c *app.RequestContext) string {
-			hlog.CtxErrorf(ctx, "jwt biz err = %+v", e.Error())
-			return e.Error()
-		},
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
 			type UserResponse struct {
 				model.Response
 				User model.User `json:"user"`
 			}
+			//if strings.Index(message, "Illegal format") != -1 {
+			//	c.JSON(http.StatusOK, UserResponse{
+			//		Response: model.Response{StatusCode: 1, StatusMsg: "用户名和密码长度不能超过32位且不能为空"},
+			//	})
+			//} else {
+			//	c.JSON(http.StatusOK, UserResponse{
+			//		Response: model.Response{StatusCode: 1, StatusMsg: "用户名或密码错误"},
+			//	})
+			//}
 			c.JSON(http.StatusOK, UserResponse{
-				Response: model.Response{StatusCode: 1, StatusMsg: "用户名或密码错误"},
+				Response: model.Response{StatusCode: 1, StatusMsg: message},
 			})
 		},
 	})
