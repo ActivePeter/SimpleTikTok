@@ -11,9 +11,9 @@ func initRouter(r *server.Hertz) {
 	apiRouter := r.Group("/douyin")
 	// basic apis
 	apiRouter.GET("/feed/", controller.Feed)
-	//apiRouter.GET("/user/", controller.UserInfo)
+
 	apiRouter.GET("/user/", mw.JwtMiddleware.MiddlewareFunc(), controller.UserInfo)
-	apiRouter.POST("/user/register/", controller.Register)
+	apiRouter.POST("/user/register/", mw.JwtMiddleware.LoginHandler)
 	apiRouter.POST("/user/login/", mw.JwtMiddleware.LoginHandler)
 	apiRouter.POST("/publish/action/", mw.JwtMiddleware.MiddlewareFunc(), controller.Publish)
 	apiRouter.GET("/publish/list/", mw.JwtMiddleware.MiddlewareFunc(), controller.PublishList)
