@@ -33,8 +33,9 @@ type UserResponse struct {
 }
 
 func UserInfo(ctx context.Context, c *app.RequestContext) {
+	user, _ := service.GetUserFromContext(c)
 	c.JSON(http.StatusOK, UserResponse{
 		Response: model.Response{StatusCode: 0},
-		User:     service.GetUserFromContext(c),
+		User:     user,
 	})
 }
