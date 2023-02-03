@@ -9,6 +9,6 @@ type video struct{}
 
 var Video = video{}
 
-func (*video) GetFeedList(userid int, after int64) (error, []model.Video) {
+func (*video) GetFeedList(userid model.UserId, after int64) (error, []model.Video) {
 	return dal.DBVideo.SelectVideo(userid, after)
 }
