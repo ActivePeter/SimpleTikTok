@@ -36,8 +36,8 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		Fail()
 		return
 	}
-
-	err, videos := service.ServiceVideo.GetFeedList(-1, 0)
+	service.GetUserFromContext(c)
+	err, videos := service.Video.GetFeedList(-1, 0)
 	if err != nil {
 		log.Default().Printf("select video failed %v\n", err)
 		Fail()
