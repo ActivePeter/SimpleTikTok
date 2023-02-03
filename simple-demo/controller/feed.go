@@ -2,8 +2,8 @@ package controller
 
 import (
 	"context"
-	"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
+	"github.com/RaymondCode/simple-demo/service"
 	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"log"
@@ -37,7 +37,7 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	err, videos := dal.DBVideo.SelectVideo(-1, 0)
+	err, videos := service.ServiceVideo.GetFeedList(-1, 0)
 	if err != nil {
 		log.Default().Printf("select video failed %v\n", err)
 		Fail()

@@ -44,6 +44,7 @@ func CheckUser(username, password string) ([]*model.User, error) {
 func UserFollowingCnt(tx *gorm.DB, uid int) {
 	//var cnt int
 	//tx.Model()
+
 }
 
 //func CreateUser(users []*model.User) error {

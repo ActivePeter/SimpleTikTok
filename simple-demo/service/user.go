@@ -1,4 +1,4 @@
-package utils
+package service
 
 import (
 	"github.com/RaymondCode/simple-demo/model"
