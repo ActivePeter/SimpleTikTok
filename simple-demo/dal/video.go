@@ -13,28 +13,6 @@ var DBVideo = videoDBAPI{}
 
 const onceFeedCnt = 30
 
-//func (*videoDBAPI) videoFavCnt(vid int, tx *gorm.DB) (error, int) {
-//	var cnt int
-//	tx.Model(&FavouriteRelation{}).
-//		Select("COUNT(user_id)").
-//		Where("video_id= ?", vid).First(&cnt)
-//	return tx.Error, cnt
-//}
-//func (*videoDBAPI) videoCommentsCnt(vid int, tx *gorm.DB) (error, int) {
-//	var cnt int
-//	tx.Model(&Comment{}).
-//		Select("COUNT(id)").
-//		Where("video_id= ?", vid).First(&cnt)
-//	return tx.Error, cnt
-//}
-//func (*videoDBAPI) isUserFav(vid int, uid int, tx *gorm.DB) (error, bool) {
-//	var cnt int
-//	tx.Model(&FavouriteRelation{}).Select("CNT(user_id)").
-//		//Where("user_id=? AND video_id=?", uid, vid).
-//		First(&cnt)
-//	return tx.Error, cnt == 1
-//}
-
 func (*videoDBAPI) SelectVideo(userid int, afterTime int64) (error, []model.Video) {
 	res := make([]model.Video, 0)
 	err := DB.Transaction(func(tx *gorm.DB) error {
