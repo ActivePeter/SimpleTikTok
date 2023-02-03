@@ -7,6 +7,9 @@ import (
 )
 
 func GetUserFromContext(c *app.RequestContext) (model.User, bool) {
-	user, err := c.Get(mw.IdentityKey)
-	return user.(model.User), err
+	user, ok := c.Get(mw.IdentityKey)
+	if ok {
+		return user.(model.User), ok
+	}
+	return model.User{}, ok
 }
