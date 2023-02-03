@@ -3,7 +3,9 @@
 package mysql
 
 import (
+	//"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
+	"gorm.io/gorm"
 )
 
 // FindUserByUsername 用于注册账号时校验用户名是否唯一
@@ -34,6 +36,11 @@ func CheckUser(username, password string) ([]*model.User, error) {
 		return nil, err
 	}
 	return res, nil
+}
+
+func UserFollowingCnt(tx *gorm.DB, uid int) {
+	//var cnt int
+	//tx.Model()
 }
 
 //func CreateUser(users []*model.User) error {

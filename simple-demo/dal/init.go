@@ -2,7 +2,10 @@ package dal
 
 import (
 	"github.com/RaymondCode/simple-demo/dal/mysql"
+	"gorm.io/gorm"
 )
+
+var DB *gorm.DB = nil
 
 func createTables() error {
 	err := mysql.DB.AutoMigrate(
@@ -19,4 +22,5 @@ func Init() {
 	if err != nil {
 		return
 	}
+	DB = mysql.DB
 }
