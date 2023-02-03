@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 	"github.com/RaymondCode/simple-demo/model"
-	"github.com/RaymondCode/simple-demo/mw"
+	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	_ "gorm.io/gorm"
 	"net/http"
@@ -33,9 +33,8 @@ type UserResponse struct {
 }
 
 func UserInfo(ctx context.Context, c *app.RequestContext) {
-	user, _ := c.Get(mw.IdentityKey)
 	c.JSON(http.StatusOK, UserResponse{
 		Response: model.Response{StatusCode: 0},
-		User:     user.(model.User),
+		User:     utils.GetUserFromContext(c),
 	})
 }
