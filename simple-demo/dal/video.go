@@ -7,13 +7,13 @@ import (
 	"log"
 )
 
-type videoDBAPI struct{}
+type dAOVideo struct{}
 
-var DBVideo = videoDBAPI{}
+var DAOVideo = dAOVideo{}
 
 const onceFeedCnt = 30
 
-func (*videoDBAPI) SelectVideo(userid model.UserId, afterTime int64) (error, []model.Video) {
+func (*dAOVideo) SelectVideo(userid model.UserId, afterTime int64) (error, []model.Video) {
 	res := make([]model.Video, 0)
 	err := DB.Transaction(func(tx *gorm.DB) error {
 		//1. 获取视频
