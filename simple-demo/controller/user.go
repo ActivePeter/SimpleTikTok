@@ -10,7 +10,7 @@ import (
 )
 
 // usersLoginInfo 请不要使用该字典，该字典来自demo，token的有效性已经在jwt中间件进行了验证
-// 要想获取user请使用c.Get(mw.IdentityKey).(model.User)
+// 要想获取user请使用utils.GetUserFromContext(c)
 var usersLoginInfo = map[string]model.User{
 	"zhangleidouyin": {
 		Id:            1,
