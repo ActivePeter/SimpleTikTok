@@ -3,7 +3,7 @@ package mw
 import (
 	"context"
 	"errors"
-	"github.com/RaymondCode/simple-demo/dal/mysql"
+	"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
@@ -45,17 +45,17 @@ func InitJwt() {
 			}
 
 			if strings.Index(c.FullPath(), "login") != -1 { // 登陆
-				users, err := mysql.CheckUser(loginStruct.Username, loginStruct.Password) // 校验用户名和密码是否正确
+				users, err := dal.CheckUser(loginStruct.Username, loginStruct.Password) // 校验用户名和密码是否正确
 				if err != nil {
 					return nil, errors.New("用户名或密码错误！")
 				}
 				return users[0], nil
 			} else { // 注册
-				res, _ := mysql.FindUserByUsername(loginStruct.Username) // 校验用户名是否已经存在
+				res, _ := dal.FindUserByUsername(loginStruct.Username) // 校验用户名是否已经存在
 				if res > 0 {
 					return nil, errors.New("用户名已存在！")
 				}
-				user, _ := mysql.CreateUser(loginStruct.Username, loginStruct.Password)
+				user, _ := dal.CreateUser(loginStruct.Username, loginStruct.Password)
 				return user, nil
 			}
 		},
