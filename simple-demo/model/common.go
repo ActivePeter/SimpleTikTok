@@ -5,45 +5,49 @@ type Response struct {
 	StatusMsg  string `json:"status_msg,omitempty"`
 }
 
+type VideoId = int64
 type Video struct {
-	Id            int64  `json:"id,omitempty"`
-	Author        User   `json:"author"`
-	PlayUrl       string `json:"play_url" json:"play_url,omitempty"`
-	CoverUrl      string `json:"cover_url,omitempty"`
-	FavoriteCount int64  `json:"favorite_count,omitempty"`
-	CommentCount  int64  `json:"comment_count,omitempty"`
-	IsFavorite    bool   `json:"is_favorite,omitempty"`
+	Id            VideoId `json:"id,omitempty"`
+	Author        User    `json:"author"`
+	PlayUrl       string  `json:"play_url" json:"play_url,omitempty"`
+	CoverUrl      string  `json:"cover_url,omitempty"`
+	FavoriteCount int64   `json:"favorite_count,omitempty"`
+	CommentCount  int64   `json:"comment_count,omitempty"`
+	IsFavorite    bool    `json:"is_favorite,omitempty"`
 }
 
+type CommentId = int64
 type Comment struct {
-	Id         int64  `json:"id,omitempty"`
-	User       User   `json:"user"`
-	Content    string `json:"content,omitempty"`
-	CreateDate string `json:"create_date,omitempty"`
+	Id         CommentId `json:"id,omitempty"`
+	User       User      `json:"user"`
+	Content    string    `json:"content,omitempty"`
+	CreateDate string    `json:"create_date,omitempty"`
 }
 
+type UserId = int64
 type User struct {
-	Id            int64  `json:"id,omitempty"`
+	Id            UserId `json:"id,omitempty"`
 	Name          string `json:"name,omitempty"`
 	FollowCount   int64  `json:"follow_count,omitempty"`
 	FollowerCount int64  `json:"follower_count,omitempty"`
 	IsFollow      bool   `json:"is_follow,omitempty"`
 }
 
+type MessageId = int64
 type Message struct {
-	Id         int64  `json:"id,omitempty"`
-	Content    string `json:"content,omitempty"`
-	CreateTime string `json:"create_time,omitempty"`
+	Id         MessageId `json:"id,omitempty"`
+	Content    string    `json:"content,omitempty"`
+	CreateTime string    `json:"create_time,omitempty"`
 }
 
 type MessageSendEvent struct {
-	UserId     int64  `json:"user_id,omitempty"`
-	ToUserId   int64  `json:"to_user_id,omitempty"`
+	UserId     UserId `json:"user_id,omitempty"`
+	ToUserId   UserId `json:"to_user_id,omitempty"`
 	MsgContent string `json:"msg_content,omitempty"`
 }
 
 type MessagePushEvent struct {
-	FromUserId int64  `json:"user_id,omitempty"`
+	FromUserId UserId `json:"user_id,omitempty"`
 	MsgContent string `json:"msg_content,omitempty"`
 }
 

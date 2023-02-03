@@ -1,17 +1,20 @@
 package dal
 
-import "time"
+import (
+	"github.com/RaymondCode/simple-demo/model"
+	"time"
+)
 
 // https://gorm.io/docs/models.html
 type User struct {
-	ID       int    `gorm:"primaryKey"`
-	Name     string `gorm:"type:varchar(255)"`
-	Username string `gorm:"type:varchar(32)"`
-	Password string `gorm:"type:varchar(32)"`
+	ID       model.UserId `gorm:"primaryKey"`
+	Name     string       `gorm:"type:varchar(255)"`
+	Username string       `gorm:"type:varchar(32)"`
+	Password string       `gorm:"type:varchar(32)"`
 }
 type VideoMeta struct {
-	ID         int `gorm:"primaryKey"`
-	Author     int
+	ID         model.UserId `gorm:"primaryKey"`
+	Author     model.UserId
 	PlayUrl    string    `gorm:"type:varchar(255)"`
 	CoverUrl   string    `gorm:"type:varchar(255)"`
 	Title      string    `gorm:"type:varchar(255)"`
@@ -19,12 +22,12 @@ type VideoMeta struct {
 	UpdateTime time.Time `gorm:"autoCreateTime"`
 }
 type FavouriteRelation struct {
-	UserID  int `gorm:"primaryKey;autoIncrement:false"`
-	VideoID int `gorm:"primaryKey;autoIncrement:false"`
+	UserID  model.UserId  `gorm:"primaryKey;autoIncrement:false"`
+	VideoID model.VideoId `gorm:"primaryKey;autoIncrement:false"`
 }
 type Comment struct {
-	Id      int `gorm:"primaryKey"`
+	Id      model.CommentId `gorm:"primaryKey"`
 	Content string
-	UserID  int
-	VideoID int
+	UserID  model.UserId
+	VideoID model.VideoId
 }
