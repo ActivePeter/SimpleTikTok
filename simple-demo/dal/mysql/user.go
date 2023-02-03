@@ -19,15 +19,18 @@ func FindUserByUsername(username string) (int64, error) {
 }
 
 // CreateUser 通过用户名和密码创建账号，用户名称默认和用户名相同，返回用户id
-func CreateUser(username string, password string) (int64, error) {
+func CreateUser(username string, password string) (*model.User, error) {
 	type registerInf struct {
 		Id       int64
 		Username string
 		Name     string
 		Password string
 	}
-	user := registerInf{Username: username, Name: username, Password: password}
-	return user.Id, DB.Table("users").Create(&user).Error
+	regInf := registerInf{Username: username, Name: username, Password: password}
+	err := DB.Table("users").Create(&regInf).Error
+
+	user := &model.User{Id: regInf.Id, Name: username, FollowCount: 0, FollowerCount: 0}
+	return user, err
 }
 
 func CheckUser(username, password string) ([]*model.User, error) {
