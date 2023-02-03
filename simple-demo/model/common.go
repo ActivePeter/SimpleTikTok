@@ -46,3 +46,8 @@ type MessagePushEvent struct {
 	FromUserId int64  `json:"user_id,omitempty"`
 	MsgContent string `json:"msg_content,omitempty"`
 }
+
+type FavouriteRelation struct {
+	UserID  int `gorm:"primaryKey;autoIncrement:false"`
+	VideoID int `gorm:"primaryKey;autoIncrement:false"`
+}
