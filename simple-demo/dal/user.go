@@ -9,9 +9,9 @@ import (
 )
 
 // FindUserByUsername 用于注册账号时校验用户名是否唯一
-func FindUserByUsername(username string) (int64, error) {
+func FindUserByUsername(tx *gorm.DB, username string) (int64, error) {
 	tmp := model.User{}
-	res := DB.Table("users").Where("username = ?", username).First(&tmp)
+	res := tx.Table("users").Where("username = ?", username).First(&tmp)
 	if res.Error != nil {
 		return 0, res.Error
 	}
@@ -19,7 +19,7 @@ func FindUserByUsername(username string) (int64, error) {
 }
 
 // CreateUser 通过用户名和密码创建账号，用户名称默认和用户名相同，返回用户id
-func CreateUser(username string, password string) (*model.User, error) {
+func CreateUser(tx *gorm.DB, username string, password string) (*model.User, error) {
 	type registerInf struct {
 		Id       int64
 		Username string
@@ -27,15 +27,15 @@ func CreateUser(username string, password string) (*model.User, error) {
 		Password string
 	}
 	regInf := registerInf{Username: username, Name: username, Password: password}
-	err := DB.Table("users").Create(&regInf).Error
+	err := tx.Table("users").Create(&regInf).Error
 
 	user := &model.User{Id: regInf.Id, Name: username, FollowCount: 0, FollowerCount: 0}
 	return user, err
 }
 
-func CheckUser(username, password string) ([]*model.User, error) {
+func CheckUser(tx *gorm.DB, username, password string) ([]*model.User, error) {
 	res := make([]*model.User, 0)
-	if err := DB.Where("username = ? AND password = ?", username, password).First(&res).Error; err != nil {
+	if err := tx.Where("username = ? AND password = ?", username, password).First(&res).Error; err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -46,31 +46,3 @@ func UserFollowingCnt(tx *gorm.DB, uid int) {
 	//tx.Model()
 
 }
-
-//func CreateUser(users []*model.User) error {
-//	return DB.Create(users).Error
-//}
-//
-//func CreateUsers(users []*model.User) error {
-//	return DB.Create(users).Error
-//}
-//
-//func FindUserByNameOrEmail(userName, email string) ([]*model.User, error) {
-//	res := make([]*model.User, 0)
-//	if err := DB.Where(DB.Or("user_name = ?", userName).
-//		Or("email = ?", email)).
-//		Find(&res).Error; err != nil {
-//		return nil, err
-//	}
-//	return res, nil
-//}
-//
-//func CheckUser(account, password string) ([]*model.User, error) {
-//	res := make([]*model.User, 0)
-//	if err := DB.Where(DB.Or("user_name = ?", account).
-//		Or("email = ?", account)).Where("password = ?", password).
-//		Find(&res).Error; err != nil {
-//		return nil, err
-//	}
-//	return res, nil
-//}

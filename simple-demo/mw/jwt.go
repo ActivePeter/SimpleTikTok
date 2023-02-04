@@ -45,17 +45,17 @@ func InitJwt() {
 			}
 
 			if strings.Index(c.FullPath(), "login") != -1 { // 登陆
-				users, err := dal.CheckUser(loginStruct.Username, loginStruct.Password) // 校验用户名和密码是否正确
+				users, err := dal.CheckUser(dal.DB, loginStruct.Username, loginStruct.Password) // 校验用户名和密码是否正确
 				if err != nil {
 					return nil, errors.New("用户名或密码错误！")
 				}
 				return users[0], nil
 			} else { // 注册
-				res, _ := dal.FindUserByUsername(loginStruct.Username) // 校验用户名是否已经存在
+				res, _ := dal.FindUserByUsername(dal.DB, loginStruct.Username) // 校验用户名是否已经存在
 				if res > 0 {
 					return nil, errors.New("用户名已存在！")
 				}
-				user, _ := dal.CreateUser(loginStruct.Username, loginStruct.Password)
+				user, _ := dal.CreateUser(dal.DB, loginStruct.Username, loginStruct.Password)
 				return user, nil
 			}
 		},
