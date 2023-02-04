@@ -9,7 +9,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 type VideosResponse struct {
@@ -29,22 +28,17 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 		log.Default().Println("绑定参数错误！")
 		return
 	}
-	//判断点赞合法性
+
 	//获取当前用户
 	user, _ := service.GetUserFromContext(c)
 	//获取被点赞的视频id
-	//tmp := c.FormValue("video_id")
-	//videoId, _ := strconv.ParseInt(string(tmp[:]), 10, 64)
 	videoId := favoriteAction.VideoId
-	actionType := favoriteAction.ActionType
 	//获取行为
-	//tmp = c.FormValue("action_type")
-	//actionType, _ := strconv.ParseInt(string(tmp[:]), 10, 64)
+	actionType := favoriteAction.ActionType
 
 	hasFavorite := dal.HasFavorite(mysql.DB, user, videoId)
 
 	success := func() {
-		log.Default().Println("操作成功！")
 		c.JSON(http.StatusOK, model.Response{
 			StatusCode: 0,
 		})
@@ -61,12 +55,14 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 			})
 			return
 		} else {
+			log.Default().Println("点赞成功")
 			success()
 		}
 	} else if actionType == 1 && hasFavorite {
+		log.Default().Println("已经给该视频点过赞！")
 		c.JSON(http.StatusBadRequest, model.Response{
 			StatusCode: 400,
-			StatusMsg:  "已点赞！",
+			StatusMsg:  "不能给已经点过赞的视频点赞！",
 		})
 	} else if actionType == 2 && hasFavorite {
 		//取消点赞
@@ -78,12 +74,14 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 			})
 			return
 		} else {
+			log.Default().Println("成功取消点赞")
 			success()
 		}
 	} else {
+		log.Default().Println("已经取消点赞！")
 		c.JSON(http.StatusBadRequest, model.Response{
 			StatusCode: 400,
-			StatusMsg:  "已取消点赞！",
+			StatusMsg:  "不能给未点赞的视频取消点赞",
 		})
 	}
 
@@ -91,34 +89,19 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 
 // 返回该用户的点赞列表
 func FavoriteList(ctx context.Context, c *app.RequestContext) {
-	//c.JSON(http.StatusOK, VideoListResponse{
-	//	Response: model.Response{
-	//		StatusCode: 0,
-	//	},
-	//	VideoList: DemoVideos,
-	//})
+
 	user, _ := service.GetUserFromContext(c)
-	userId := c.Query("user_id")
-	u, _ := strconv.ParseInt(userId, 10, 64)
-	if user.Id != u {
-		log.Default().Println("invalid request param")
+
+	if videos, err := dal.GetFavoriteVideos(mysql.DB, user); err != nil {
+		log.Default().Println(err.Error())
 		c.JSON(http.StatusBadRequest, model.Response{
 			StatusCode: 400,
-			StatusMsg:  "invalid request param",
+			StatusMsg:  "服务器出现错误",
 		})
 	} else {
-		//获取该用户点赞列表
-		if videos, err := dal.GetFavoriteVideos(mysql.DB, user); err != nil {
-			log.Default().Println(err.Error())
-			c.JSON(http.StatusBadRequest, model.Response{
-				StatusCode: 400,
-				StatusMsg:  "服务器出现错误",
-			})
-		} else {
-			c.JSON(http.StatusOK, VideosResponse{
-				0,
-				videos,
-			})
-		}
+		c.JSON(http.StatusOK, VideosResponse{
+			0,
+			videos,
+		})
 	}
 }
