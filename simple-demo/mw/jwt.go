@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
+	myUtils "github.com/RaymondCode/simple-demo/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/hertz-contrib/jwt"
@@ -45,7 +46,7 @@ func InitJwt() {
 			}
 
 			if strings.Index(c.FullPath(), "login") != -1 { // 登陆
-				users, err := dal.CheckUser(dal.DB, loginStruct.Username, loginStruct.Password) // 校验用户名和密码是否正确
+				users, err := dal.CheckUser(dal.DB, loginStruct.Username, myUtils.MD5(loginStruct.Password)) // 校验用户名和密码是否正确
 				if err != nil {
 					return nil, errors.New("用户名或密码错误！")
 				}
@@ -55,7 +56,7 @@ func InitJwt() {
 				if res > 0 {
 					return nil, errors.New("用户名已存在！")
 				}
-				user, _ := dal.CreateUser(dal.DB, loginStruct.Username, loginStruct.Password)
+				user, _ := dal.CreateUser(dal.DB, loginStruct.Username, myUtils.MD5(loginStruct.Password))
 				return user, nil
 			}
 		},

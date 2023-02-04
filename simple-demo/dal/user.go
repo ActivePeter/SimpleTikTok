@@ -1,9 +1,6 @@
-// 统一在此编写数据库访问语句
-
 package dal
 
 import (
-	//"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
 	"gorm.io/gorm"
 )
