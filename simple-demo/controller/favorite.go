@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/RaymondCode/simple-demo/dal/mysql"
 	"github.com/RaymondCode/simple-demo/model"
-	"github.com/RaymondCode/simple-demo/utils"
+	"github.com/RaymondCode/simple-demo/service"
 	"github.com/cloudwego/hertz/pkg/app"
 	"log"
 	"net/http"
@@ -24,7 +24,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	}
 	//判断点赞合法性
 	//获取当前用户
-	user := utils.GetUserFromContext(c)
+	user, _ := service.GetUserFromContext(c)
 	//获取被点赞的视频id
 	//tmp := c.FormValue("video_id")
 	//videoId, _ := strconv.ParseInt(string(tmp[:]), 10, 64)
