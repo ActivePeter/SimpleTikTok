@@ -19,6 +19,7 @@ func HasFavorite(tx *gorm.DB, user model.User, videoId int64) bool {
 	}
 }
 
+// 点赞视频
 func FavoriteVideo(tx *gorm.DB, user model.User, videoId int64) error {
 	relation := model.FavouriteRelation{
 		VideoID: int(videoId),
@@ -31,6 +32,7 @@ func FavoriteVideo(tx *gorm.DB, user model.User, videoId int64) error {
 	}
 }
 
+// 取消点赞
 func UnFavoriteVideo(tx *gorm.DB, user model.User, videoId int64) error {
 	relation := model.FavouriteRelation{
 		VideoID: int(videoId),
