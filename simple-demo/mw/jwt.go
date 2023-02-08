@@ -26,14 +26,19 @@ func InitJwt() {
 		Key:           []byte("secret key"),
 		Timeout:       time.Hour,
 		MaxRefresh:    time.Hour,
-		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
+		TokenLookup:   "header: Authorization, query: token, cookie: jwt, form: token",
 		TokenHeadName: "Bearer",
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
+			if code == 200 {
+				code = 0
+			} else {
+				code = -1
+			}
 			c.JSON(http.StatusOK, utils.H{
-				"code":    code,
-				"token":   token,
-				"expire":  expire.Format(time.RFC3339),
-				"message": "success",
+				"status_code": code,
+				"status_msg":  "success",
+				"token":       token,
+				"expire":      expire.Format(time.RFC3339),
 			})
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
