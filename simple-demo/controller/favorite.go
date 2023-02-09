@@ -36,54 +36,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	//获取行为
 	actionType := favoriteAction.ActionType
 
-	hasFavorite := dal.HasFavorite(mysql.DB, user, videoId)
-
-	success := func() {
-		c.JSON(http.StatusOK, model.Response{
-			StatusCode: 0,
-		})
-	}
-
-	//如果没有点过赞且行为为点赞，则可以点赞
-	if actionType == 1 && !hasFavorite {
-		//进行点赞操作
-		if err := dal.FavoriteVideo(mysql.DB, user, videoId); err != nil {
-			log.Default().Println(err.Error())
-			c.JSON(http.StatusBadRequest, model.Response{
-				StatusCode: 400,
-				StatusMsg:  "服务器出现错误",
-			})
-			return
-		} else {
-			log.Default().Println("点赞成功")
-			success()
-		}
-	} else if actionType == 1 && hasFavorite {
-		log.Default().Println("已经给该视频点过赞！")
-		c.JSON(http.StatusBadRequest, model.Response{
-			StatusCode: 400,
-			StatusMsg:  "不能给已经点过赞的视频点赞！",
-		})
-	} else if actionType == 2 && hasFavorite {
-		//取消点赞
-		if err := dal.UnFavoriteVideo(mysql.DB, user, videoId); err != nil {
-			log.Default().Println(err.Error())
-			c.JSON(http.StatusBadRequest, model.Response{
-				StatusCode: 400,
-				StatusMsg:  "服务器出现错误",
-			})
-			return
-		} else {
-			log.Default().Println("成功取消点赞")
-			success()
-		}
-	} else {
-		log.Default().Println("已经取消点赞！")
-		c.JSON(http.StatusBadRequest, model.Response{
-			StatusCode: 400,
-			StatusMsg:  "不能给未点赞的视频取消点赞",
-		})
-	}
+	service.FavoriteAction(c, user, videoId, actionType)
 
 }
 
