@@ -31,3 +31,7 @@ type Comment struct {
 	UserID  model.UserId
 	VideoID model.VideoId
 }
+type FollowRelation struct {
+	FromID model.UserId `gorm:"primaryKey;autoIncrement:false"`
+	ToID   model.UserId `gorm:"primaryKey;autoIncrement:false"`
+}
