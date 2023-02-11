@@ -11,7 +11,7 @@ func main() {
 	go service.RunMessageServer()
 	dal.Init()
 	mw.InitJwt()
-	h := server.Default()
+	h := server.New(server.WithStreamBody(true))
 	initRouter(h)
 	h.Spin()
 }
