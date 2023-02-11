@@ -49,7 +49,6 @@ func InitJwt() {
 			if err := c.BindAndValidate(&loginStruct); err != nil {
 				return nil, errors.New("用户名和密码长度不能超过32位且不能为空")
 			}
-
 			if strings.Index(c.FullPath(), "login") != -1 { // 登陆
 				users, err := dal.CheckUser(dal.DB, loginStruct.Username, myUtils.MD5(loginStruct.Password)) // 校验用户名和密码是否正确
 				if err != nil {
