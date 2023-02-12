@@ -50,7 +50,7 @@ func SelectFollowers(tx *gorm.DB, toId model.UserId) ([]model.User, error) {
 		Where("follow_relations.to_id = ?", toId).
 		Joins("left join users on from_id = users.id").Find(&users).Error
 	for i := 0; i < len(users); i++ {
-		res, _ := isFollow(DB, users[i].Id, toId)
+		res, _ := isFollow(DB, toId, users[i].Id)
 		if res == true {
 			users[i].IsFollow = true
 		}
