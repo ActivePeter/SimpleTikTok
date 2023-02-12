@@ -38,8 +38,8 @@ func CheckUser(tx *gorm.DB, username, password string) ([]*model.User, error) {
 	return res, nil
 }
 
-func UserFollowingCnt(tx *gorm.DB, uid int) {
-	//var cnt int
-	//tx.Model()
-
+func FindUserById(tx *gorm.DB, uid int64) model.User {
+	var user model.User
+	tx.Table("users").Where("id = ?", uid).First(&user)
+	return user
 }

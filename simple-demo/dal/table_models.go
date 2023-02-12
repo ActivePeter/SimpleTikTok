@@ -26,8 +26,9 @@ type FavouriteRelation struct {
 	VideoID model.VideoId `gorm:"primaryKey;autoIncrement:false"`
 }
 type Comment struct {
-	Id      model.CommentId `gorm:"primaryKey"`
-	Content string
-	UserID  model.UserId
-	VideoID model.VideoId
+	Id         model.CommentId `gorm:"primaryKey"`
+	Content    string
+	UserID     model.UserId
+	VideoID    model.VideoId
+	CreateTime time.Time `gorm:"autoUpdateTime:milli"`
 }
