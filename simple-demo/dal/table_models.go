@@ -32,3 +32,7 @@ type Comment struct {
 	VideoID    model.VideoId
 	CreateTime time.Time `gorm:"autoUpdateTime:milli"`
 }
+type FollowRelation struct {
+	FromID model.UserId `gorm:"primaryKey;autoIncrement:false"`
+	ToID   model.UserId `gorm:"primaryKey;autoIncrement:false"`
+}
