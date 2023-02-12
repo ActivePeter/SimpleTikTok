@@ -3,6 +3,7 @@ package dal
 import (
 	"github.com/RaymondCode/simple-demo/model"
 	"gorm.io/gorm"
+	"log"
 )
 
 type dAORelation struct{}
@@ -69,4 +70,40 @@ func isFollow(tx *gorm.DB, fromId model.UserId, toId model.UserId) (bool, error)
 	} else {
 		return false, nil
 	}
+}
+
+func GetFriendList(tx *gorm.DB, fromId model.UserId) ([]model.User, error) {
+	log.Default().Println("GetFriendList")
+	var users []model.User
+	sql := "select id,username name,follow_count,follower_count " +
+		"from users " +
+		"where id in " +
+		"(" +
+		"select a.to_id " +
+		"from follow_relations a " +
+		"join follow_relations b " +
+		"on a.from_id = b.to_id " +
+		"and a.to_id = b.from_id " +
+		"where a.from_id = ? " +
+		")"
+	if rows, err := tx.Raw(sql, fromId).Rows(); err != nil {
+		return nil, err
+	} else {
+		for rows.Next() {
+			tmp := model.User{}
+			rows.Scan(&tmp.Id, &tmp.Name, &tmp.FollowCount, &tmp.FollowerCount)
+			tmp.IsFollow = true
+			users = append(users, tmp)
+		}
+		return users, nil
+	}
+
+	//tx.Model(&model.User{}).
+	//	Select("id,username,follow_count,follower_count").
+	//	Where("id in ?",
+	//		tx.Table("follow_relations a").
+	//		Select("to_id").
+	//		Joins("join follow_relations b on a.from_id = b.to_id and a.to_id = b.from_id").
+	//		Where("a.from_id = ?",formId).
+	//	).Find(users)
 }

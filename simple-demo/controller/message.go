@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/RaymondCode/simple-demo/model"
 	"github.com/cloudwego/hertz/pkg/app"
+	"log"
 	"net/http"
 	"strconv"
 	"sync/atomic"
@@ -22,6 +23,7 @@ type ChatResponse struct {
 
 // MessageAction no practical effect, just check if token is valid
 func MessageAction(ctx context.Context, c *app.RequestContext) {
+	log.Default().Println("MessageAction")
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
 	content := c.Query("content")
@@ -50,6 +52,7 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 
 // MessageChat all users have same follow list
 func MessageChat(ctx context.Context, c *app.RequestContext) {
+	log.Default().Println("MessageChat")
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
 

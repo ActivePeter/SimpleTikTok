@@ -15,6 +15,11 @@ type UserListResponse struct {
 	UserList []model.User `json:"user_list"`
 }
 
+type FriendListResponse struct {
+	model.Response
+	UserList []model.FriendUser `json:"user_list,omitempty"`
+}
+
 // RelationAction no practical effect, just check if token is valid
 func RelationAction(ctx context.Context, c *app.RequestContext) {
 	type RelationActionRequest struct {
@@ -106,10 +111,25 @@ func FollowerList(ctx context.Context, c *app.RequestContext) {
 
 // FriendList all users have same friend list
 func FriendList(ctx context.Context, c *app.RequestContext) {
-	c.JSON(http.StatusOK, UserListResponse{
-		Response: model.Response{
-			StatusCode: 0,
-		},
-		UserList: []model.User{DemoUser},
-	})
+	log.Default().Println("FriendList")
+
+	user, status := service.GetUserFromContext(c)
+
+	if status == false {
+		c.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
+	}
+	//通过当前的用户Id获取该用户的 朋友 列表
+	if friendList, err := service.Relation.GetFriendList(user.Id); err != nil {
+		c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: 1,
+			StatusMsg:  "Can't get friend list",
+		})
+	} else {
+		c.JSON(http.StatusOK, FriendListResponse{
+			model.Response{StatusCode: http.StatusOK},
+			friendList,
+		})
+	}
+
 }

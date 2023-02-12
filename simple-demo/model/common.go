@@ -55,3 +55,10 @@ type FavouriteRelation struct {
 	UserID  int `gorm:"primaryKey;autoIncrement:false"`
 	VideoID int `gorm:"primaryKey;autoIncrement:false"`
 }
+
+type FriendUser struct {
+	User
+	Avatar  string `json:"avatar,omitempty"`
+	Message string `json:"message,omitempty"`
+	MsgType int64  `json:"msgType,omitempty"`
+}
