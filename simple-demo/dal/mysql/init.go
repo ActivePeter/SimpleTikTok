@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var dsn = "simple_tiktok:74123@tcp(cn-zz-bgp-8.natfrp.cloud:12240)/simple_tiktok?parseTime=True"
+var dsn = "simple_tiktok:123456@tcp(43.143.166.162:3306)/simple_tiktok?parseTime=True"
 
 var DB *gorm.DB
 

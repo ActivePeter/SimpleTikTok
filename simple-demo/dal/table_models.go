@@ -7,11 +7,14 @@ import (
 
 // https://gorm.io/docs/models.html
 type User struct {
-	ID       model.UserId `gorm:"primaryKey"`
-	Name     string       `gorm:"type:varchar(255)"`
-	Username string       `gorm:"type:varchar(32)"`
-	Password string       `gorm:"type:varchar(32)"`
+	ID            model.UserId `gorm:"primaryKey"`
+	Name          string       `gorm:"type:varchar(255)"`
+	Username      string       `gorm:"type:varchar(32)"`
+	Password      string       `gorm:"type:varchar(32)"`
+	FollowCount   int64        `gorm:"default:0"`
+	FollowerCount int64        `gorm:"default:0"`
 }
+
 type VideoMeta struct {
 	ID         model.UserId `gorm:"primaryKey"`
 	Author     model.UserId
