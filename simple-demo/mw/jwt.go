@@ -34,9 +34,11 @@ func InitJwt() {
 			} else {
 				code = -1
 			}
+			userId, _ := c.Get("user_id")
 			c.JSON(http.StatusOK, utils.H{
 				"status_code": code,
 				"status_msg":  "success",
+				"user_id":     userId,
 				"token":       token,
 				"expire":      expire.Format(time.RFC3339),
 			})
@@ -54,6 +56,7 @@ func InitJwt() {
 				if err != nil {
 					return nil, errors.New("用户名或密码错误！")
 				}
+				c.Set("user_id", users[0].Id)
 				return users[0], nil
 			} else { // 注册
 				res, _ := dal.FindUserByUsername(dal.DB, loginStruct.Username) // 校验用户名是否已经存在
@@ -61,6 +64,7 @@ func InitJwt() {
 					return nil, errors.New("用户名已存在！")
 				}
 				user, _ := dal.CreateUser(dal.DB, loginStruct.Username, myUtils.MD5(loginStruct.Password))
+				c.Set("user_id", user.Id)
 				return user, nil
 			}
 		},
