@@ -62,3 +62,11 @@ type FriendUser struct {
 	Message string `json:"message,omitempty"`
 	MsgType int64  `json:"msgType,omitempty"`
 }
+
+type Msg struct {
+	//Id         int64  `json:"id,omitempty"`
+	ToUserId   UserId `json:"to_user_id,omitempty"`
+	FromUserId UserId `json:"from_user_id,omitempty"`
+	Content    string `json:"content,omitempty"`
+	CreateTime string `json:"create_time,omitempty"`
+}

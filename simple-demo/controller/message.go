@@ -3,12 +3,13 @@ package controller
 import (
 	"context"
 	"fmt"
+	"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
+	"github.com/RaymondCode/simple-demo/service"
 	"github.com/cloudwego/hertz/pkg/app"
 	"log"
 	"net/http"
 	"strconv"
-	"sync/atomic"
 	"time"
 )
 
@@ -24,30 +25,58 @@ type ChatResponse struct {
 // MessageAction no practical effect, just check if token is valid
 func MessageAction(ctx context.Context, c *app.RequestContext) {
 	log.Default().Println("MessageAction")
-	token := c.Query("token")
-	toUserId := c.Query("to_user_id")
-	content := c.Query("content")
-
-	if user, exist := usersLoginInfo[token]; exist {
-		userIdB, _ := strconv.Atoi(toUserId)
-		chatKey := genChatKey(user.Id, int64(userIdB))
-
-		atomic.AddInt64(&messageIdSequence, 1)
-		curMessage := model.Message{
-			Id:         messageIdSequence,
-			Content:    content,
-			CreateTime: time.Now().Format(time.Kitchen),
-		}
-
-		if messages, exist := tempChat[chatKey]; exist {
-			tempChat[chatKey] = append(messages, curMessage)
-		} else {
-			tempChat[chatKey] = []model.Message{curMessage}
-		}
-		c.JSON(http.StatusOK, model.Response{StatusCode: 0})
-	} else {
-		c.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	//验证用户
+	user, exists := service.GetUserFromContext(c)
+	if !exists {
+		log.Default().Println("用户不存在!")
+		return
 	}
+
+	var messageAction struct {
+		ToUserId   int64  `form:"to_user_id" json:"to_user_id" query:"to_user_id"`
+		ActionType int32  `form:"action_type" json:"action_type" query:"action_type"`
+		Content    string `form:"content" json:"content" query:"content"`
+	}
+
+	if err := c.BindAndValidate(&messageAction); err != nil {
+		log.Default().Println("参数绑定错误!")
+		return
+	}
+
+	//发送方用户id
+	fromUserId := user.Id
+	toUserId := messageAction.ToUserId
+	actionType := messageAction.ActionType
+	content := messageAction.Content
+
+	if actionType != 1 {
+		log.Default().Println("功能暂未完善")
+		c.JSON(http.StatusNotFound, model.Response{
+			StatusCode: http.StatusNotFound,
+			StatusMsg:  "功能尚未完善",
+		})
+		return
+	}
+
+	msg := model.Msg{
+		ToUserId:   toUserId,
+		FromUserId: fromUserId,
+		Content:    content,
+		CreateTime: time.Now().String(),
+	}
+
+	if success := dal.AddMessage(dal.DB, msg); !success {
+		log.Default().Println("发送消息失败")
+		c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			StatusMsg:  "发送消息失败",
+		})
+	} else {
+		c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
+		})
+	}
+
 }
 
 // MessageChat all users have same follow list
