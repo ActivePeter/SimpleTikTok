@@ -39,3 +39,11 @@ type FollowRelation struct {
 	FromID model.UserId `gorm:"primaryKey;autoIncrement:false"`
 	ToID   model.UserId `gorm:"primaryKey;autoIncrement:false"`
 }
+
+type Message struct {
+	Id         int64 `gorm:"primaryKey;autoIncrement"`
+	ToUserId   model.UserId
+	FromUserId model.UserId
+	Content    string
+	CreateTime string `gorm:"autoCreateTime"`
+}

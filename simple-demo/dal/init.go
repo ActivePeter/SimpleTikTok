@@ -17,7 +17,8 @@ func createTables() error {
 		&User{},
 		&FavouriteRelation{},
 		&VideoMeta{},
-		&FollowRelation{})
+		&FollowRelation{},
+		&Message{})
 	return err
 }
 
