@@ -1,18 +1,13 @@
 package dal
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/RaymondCode/simple-demo/model"
-	"github.com/disintegration/imaging"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"gorm.io/gorm"
 	"log"
-	"os"
-	"strings"
 )
 
-//上传视频至数据库
+// 上传视频至数据库
 func UploadVideo(tx *gorm.DB, Video VideoMeta) error {
 
 	if err := tx.Create(&Video); err != nil {
@@ -40,36 +35,6 @@ func GetLatestVideoId(tx *gorm.DB) (model.VideoId, error) {
 	fmt.Println(res.Id)
 	return res.Id, err
 
-}
-
-// 截视频的第一帧作为封面
-func GetSnapshot(videoPath, snapshotPath string, frameNum int) (snapshotName string, err error) {
-	buf := bytes.NewBuffer(nil)
-	err = ffmpeg.Input(videoPath).
-		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", frameNum)}).
-		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
-		WithOutput(buf, os.Stdout).
-		Run()
-	if err != nil {
-		log.Fatal("生成缩略图失败：", err)
-		return "", err
-	}
-
-	img, err := imaging.Decode(buf)
-	if err != nil {
-		log.Fatal("生成缩略图失败：", err)
-		return "", err
-	}
-
-	err = imaging.Save(img, snapshotPath+".png")
-	if err != nil {
-		log.Fatal("生成缩略图失败：", err)
-		return "", err
-	}
-
-	names := strings.Split(snapshotPath, "\\")
-	snapshotName = names[len(names)-1] + ".png"
-	return
 }
 
 // 获取个人视频列表
