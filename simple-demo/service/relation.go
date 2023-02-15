@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/RaymondCode/simple-demo/dal"
+	"github.com/RaymondCode/simple-demo/dal/mysql"
 	"github.com/RaymondCode/simple-demo/model"
 	"log"
 )
@@ -24,12 +25,17 @@ func (*relation) GetFriendList(from model.UserId) ([]model.FriendUser, error) {
 		url := "https://tse4-mm.cn.bing.net/th/id/OIP-C.kHtLyqTcn4yBGCUcWQxvcwHaHa?pid=ImgDet&rs=1"
 		//将User封装为FriendUser
 		for _, user := range users {
-			fu := model.FriendUser{
-				User:    user,
-				Avatar:  url,
-				MsgType: 0,
+			if latestMessage, err := dal.GetLatestMessage(mysql.DB, from, user.Id); err != nil {
+				return nil, err
+			} else {
+				fu := model.FriendUser{
+					User:    user,
+					Avatar:  url,
+					Message: latestMessage.Message,
+					MsgType: latestMessage.MsgType,
+				}
+				friends = append(friends, fu)
 			}
-			friends = append(friends, fu)
 		}
 		return friends, nil
 	}
