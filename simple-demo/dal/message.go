@@ -90,12 +90,14 @@ func GetLatestMessage(tx *gorm.DB, userId model.UserId, friendId model.UserId) (
 		return latestMessage, nil
 	}
 }
-func GetMassges(userId model.UserId, toUserId model.UserId) ([]model.Msg, error) {
+
+// 获取聊天记录
+func GetMessages(userIdA model.UserId, UserIdB model.UserId) ([]model.Msg, error) {
 	res := make([]model.Msg, 0)
 	err := DB.Transaction(func(tx *gorm.DB) error {
-
 		err := tx.Debug().Table("messages").
-			Where("to_user_id = ? AND from_user_id = ?", toUserId, userId).Find(&res)
+			Where("to_user_id IN (?) AND from_user_id IN (?)", []int64{userIdA, UserIdB}, []int64{userIdA, UserIdB}).
+			Order("create_time").Find(&res)
 		if err != nil {
 			return err.Error
 		}

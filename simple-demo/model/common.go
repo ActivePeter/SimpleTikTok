@@ -34,6 +34,7 @@ type User struct {
 }
 
 type MessageId = int64
+
 type Message struct {
 	Id         MessageId `json:"id,omitempty"`
 	Content    string    `json:"content,omitempty"`
@@ -64,7 +65,7 @@ type FriendUser struct {
 }
 
 type Msg struct {
-	//Id         int64  `json:"id,omitempty"`
+	Id         int64  `json:"id,omitempty"`
 	ToUserId   UserId `json:"to_user_id,omitempty"`
 	FromUserId UserId `json:"from_user_id,omitempty"`
 	Content    string `json:"content,omitempty"`
