@@ -1,0 +1,7 @@
+#数据库用户名
+sql_user:
+#数据库密码
+sql_pw:
+#数据库地址 如 1.1.1.1:3306, hhh.com:3306
+sql_addr:
+schema:
