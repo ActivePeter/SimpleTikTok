@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"github.com/RaymondCode/simple-demo/dal"
 	"github.com/RaymondCode/simple-demo/model"
 	"github.com/RaymondCode/simple-demo/service"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -34,6 +35,8 @@ type UserResponse struct {
 
 func UserInfo(ctx context.Context, c *app.RequestContext) {
 	user, _ := service.GetUserFromContext(c)
+	user.FollowCount, _ = dal.SelectFollowsNum(dal.DB, user.Id)
+	user.FollowerCount, _ = dal.SelectFollowersNum(dal.DB, user.Id)
 	c.JSON(http.StatusOK, UserResponse{
 		Response: model.Response{StatusCode: 0},
 		User:     user,
