@@ -3,6 +3,7 @@ package dal
 import (
 	"github.com/RaymondCode/simple-demo/dal/mysql"
 	"github.com/RaymondCode/simple-demo/dal/redisConfig"
+	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 )
@@ -22,8 +23,8 @@ func createTables() error {
 	return err
 }
 
-func Init() {
-	mysql.Init()
+func Init(config *utils.ServerConfig) {
+	mysql.Init(config)
 	redisConfig.Init()
 	err := createTables()
 	if err != nil {
