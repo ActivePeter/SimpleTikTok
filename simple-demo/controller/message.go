@@ -16,7 +16,7 @@ import (
 )
 
 var tempChat = map[string][]model.Msg{}
-
+var chatKey_ChatLength = make(map[string]int)
 var messageIdSequence = int64(1)
 
 type ChatResponse struct {
@@ -76,6 +76,7 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 	} else {
 		c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusOK,
+			StatusMsg:  "发送消息成功！",
 		})
 	}
 
@@ -95,32 +96,53 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		fmt.Println("Dial error: ", err)
 		return
 	}
-	defer conn.Close()
 
 	userId := user.Id
 	toUserId := c.Query("to_user_id")
 	userIdB, _ := strconv.Atoi(toUserId)
 	chatKey := genChatKey(userId, int64(userIdB))
-
+	var finalMessages = []model.Msg{}
 	// 读取消息
-	if online, err := dal.GetMessages(userId, int64(userIdB)); err != nil {
-		return
+	messages, _ := dal.GetMessages(userId, int64(userIdB))
+	ChatLength := len(messages) //得到当前聊天的长度，如果长度没变就不更新
+	if _, mapExist := chatKey_ChatLength[chatKey]; mapExist {
+		//map存在时，说明已经写入过消息记录
+		newMessagesNums := ChatLength - chatKey_ChatLength[chatKey]
+		fmt.Println(newMessagesNums)
+		//获得最新的消息记录
+		if newMessages, err := dal.GetNewMessages(userId, int64(userIdB), newMessagesNums); err != nil {
+			return
+		} else {
+			finalMessages = newMessages
+		}
 	} else {
-		for _, o := range online {
-			onlineEvent := model.MessageSendEvent{
-				UserId:     o.FromUserId,
-				ToUserId:   o.ToUserId,
-				MsgContent: o.Content,
-			}
-			onlineData, _ := json.Marshal(onlineEvent)
-			_, err = conn.Write(onlineData)
-			if err != nil {
-				fmt.Println("Error writing:", err.Error())
-				return
-			}
+		// map不存在
+		finalMessages = messages
+	}
+
+	//聊天记录长度存入map
+	chatKey_ChatLength[chatKey] = len(messages)
+
+	//聊天记录存入tempChat
+	tempChat[chatKey] = messages
+
+	eventList := make([]model.MessageSendEvent, 0)
+	//遍历finalMessages，就是最新更新的消息
+	for _, message := range finalMessages {
+		chatEvent := model.MessageSendEvent{
+			UserId:     message.FromUserId,
+			ToUserId:   message.ToUserId,
+			MsgContent: message.Content,
+		}
+		eventList = append(eventList, chatEvent)
+		chatData, _ := json.Marshal(chatEvent)
+		_, err = conn.Write(chatData)
+		if err != nil {
+			fmt.Println("Error writing:", err.Error())
+			return
 		}
 	}
-	//
+	c.JSON(http.StatusOK, ChatResponse{Response: model.Response{StatusCode: 0}, MessageList: finalMessages})
 	//// 读取用户输入并发送私信
 	//scanner := bufio.NewScanner(os.Stdin)
 	//for scanner.Scan() {
@@ -140,42 +162,8 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 	//		return
 	//	}
 	//}
-	c.JSON(http.StatusOK, ChatResponse{Response: model.Response{StatusCode: 0}, MessageList: tempChat[chatKey]})
-}
 
-// MessageChat all users have same follow list
-//func MessageChat(ctx context.Context, c *app.RequestContext) {
-//	log.Default().Println("MessageChat")
-//	//验证用户
-//	user, exists := service.GetUserFromContext(c)
-//	if !exists {
-//		log.Default().Println("用户不存在!")
-//		return
-//	}
-//	userId := user.Id
-//	to_user_id := c.Query("to_user_id")
-//	toUserId, err := strconv.ParseInt(to_user_id, 10, 64)
-//	if err != nil {
-//		c.JSON(http.StatusOK, model.Response{
-//			StatusCode: 1,
-//			StatusMsg:  err.Error(),
-//		})
-//	}
-//	if messages, err := dal.GetMassges(userId, toUserId); err != nil {
-//		fmt.Println(err)
-//		c.JSON(http.StatusBadRequest, model.Response{
-//			StatusCode: 1,
-//			StatusMsg:  err.Error(),
-//		})
-//	} else {
-//		c.JSON(http.StatusOK, ChatResponse{
-//			Response: model.Response{
-//				StatusCode: 0,
-//			},
-//			MessageList: messages,
-//		})
-//	}
-//}
+}
 
 func genChatKey(userIdA int64, userIdB int64) string {
 	if userIdA > userIdB {
