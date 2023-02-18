@@ -8,6 +8,10 @@ import (
 )
 
 func main() {
+	err, _ := loadConfig()
+	if err != nil {
+		return
+	}
 	go service.RunMessageServer()
 	dal.Init()
 	mw.InitJwt()
