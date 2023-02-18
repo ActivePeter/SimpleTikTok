@@ -21,7 +21,7 @@ func printConfigContent() {
 			"#数据库地址 如 1.1.1.1:3306, hhh.com:3306 \nsql_addr:\n" +
 			"schema:\n")
 }
-func loadConfig() (error, *ServerConfig) {
+func LoadConfig() (error, *ServerConfig) {
 	dataBytes, err := os.ReadFile("config.yaml")
 	if err != nil {
 		//打印配置文件模版

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	err, config := utils.loadConfig()
+	err, config := utils.LoadConfig()
 	if err != nil {
 		return
 	}
