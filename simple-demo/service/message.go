@@ -10,8 +10,6 @@ import (
 )
 
 var chatConnMap = sync.Map{}
-var connections = make(map[int64]net.Conn)
-var tempChat = map[string][]model.Msg{}
 
 func RunMessageServer() {
 	listen, err := net.Listen("tcp", "127.0.0.1:9090")
@@ -51,13 +49,6 @@ func process(conn net.Conn) {
 		fmt.Printf("Receive Message：%+v\n", event)
 
 		// 消息内容为空表示用户上线，将连接存入map中
-		if event.MsgContent == "" {
-			fmt.Println("userId ", event.UserId)
-			connections[event.UserId] = conn
-			fmt.Printf("User %d online\n", event.UserId)
-			continue
-		}
-
 		fromChatKey := fmt.Sprintf("%d_%d", event.UserId, event.ToUserId)
 		if len(event.MsgContent) == 0 {
 			chatConnMap.Store(fromChatKey, conn)
@@ -80,23 +71,5 @@ func process(conn net.Conn) {
 		if err != nil {
 			fmt.Printf("Push message failed: %v\n", err)
 		}
-
-		//
-		//// 从map中取出对应的连接并发送消息
-		//if toConn, ok := connections[event.ToUserId]; ok {
-		//	pushEvent := model.MessagePushEvent{
-		//		FromUserId: event.UserId,
-		//		MsgContent: event.MsgContent,
-		//	}
-		//	pushData, _ := json.Marshal(pushEvent)
-		//	_, err = toConn.Write(pushData)
-		//	if err != nil {
-		//		fmt.Println("Error writing", err.Error())
-		//		continue
-		//	}
-		//	fmt.Printf("User %d send message to user %d: %s\n", event.UserId, event.ToUserId, event.MsgContent)
-		//} else {
-		//	fmt.Printf("User %d offline\n", event.ToUserId)
-		//}
 	}
 }
