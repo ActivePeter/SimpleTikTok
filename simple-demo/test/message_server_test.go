@@ -3,7 +3,7 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RaymondCode/simple-demo/controller"
+	"github.com/RaymondCode/simple-demo/model"
 	"io"
 	"net"
 	"testing"
@@ -46,7 +46,7 @@ func readMessage(conn net.Conn) {
 			continue
 		}
 
-		var event = controller.MessagePushEvent{}
+		var event = model.MessagePushEvent{}
 		_ = json.Unmarshal(buf[:n], &event)
 		fmt.Printf("Read message：%+v\n", event)
 	}
@@ -57,7 +57,7 @@ func sendMessage(fromUserId int, toUserId int, fromConn net.Conn) {
 
 	for i := 0; i < 3; i++ {
 		time.Sleep(time.Second)
-		sendEvent := controller.MessageSendEvent{
+		sendEvent := model.MessageSendEvent{
 			UserId:     int64(fromUserId),
 			ToUserId:   int64(toUserId),
 			MsgContent: "Test Content",
@@ -73,11 +73,11 @@ func sendMessage(fromUserId int, toUserId int, fromConn net.Conn) {
 }
 
 func createChat(userIdA int, connA net.Conn, userIdB int, connB net.Conn) {
-	chatEventA := controller.MessageSendEvent{
+	chatEventA := model.MessageSendEvent{
 		UserId:   int64(userIdA),
 		ToUserId: int64(userIdB),
 	}
-	chatEventB := controller.MessageSendEvent{
+	chatEventB := model.MessageSendEvent{
 		UserId:   int64(userIdB),
 		ToUserId: int64(userIdA),
 	}
