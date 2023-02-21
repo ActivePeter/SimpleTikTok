@@ -18,6 +18,10 @@ func (*dAOVideo) SelectVideo(userid model.UserId, afterTime int64) (error, []mod
 	res := make([]model.Video, 0)
 	err := DB.Transaction(func(tx *gorm.DB) error {
 		//1. 获取视频
+		afterTimeCond := ""
+		if afterTime > 0 {
+			afterTimeCond = fmt.Sprintf("video_meta.create_time < (SELECT FROM_UNIXTIME(%v))", afterTime)
+		}
 		rows, err := tx.Debug().Model(&VideoMeta{}).Limit(onceFeedCnt).
 			Joins("inner join users on video_meta.author=users.id").
 			Select("video_meta.id, video_meta.author, video_meta.play_url, video_meta.cover_url,"+ //video
@@ -35,7 +39,7 @@ func (*dAOVideo) SelectVideo(userid model.UserId, afterTime int64) (error, []mod
 					Where("video_id=video_meta.id").Select("COUNT(user_id)"),
 				tx.Model(&Comment{}).
 					Where("video_id=video_meta.id").Select("COUNT(id)"),
-			).Limit(onceFeedCnt).Rows()
+			).Where(afterTimeCond).Limit(onceFeedCnt).Rows()
 		if err != nil {
 			return err
 		}
