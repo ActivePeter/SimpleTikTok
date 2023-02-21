@@ -12,8 +12,8 @@ import (
 
 func TestMessageServer(t *testing.T) {
 	e := newExpect(t)
-	userIdA, _ := getTestUserToken(testUserA, e)
-	userIdB, _ := getTestUserToken(testUserB, e)
+	userIdA, _ := getTestUserToken(testUserA+RandSuffix(), e)
+	userIdB, _ := getTestUserToken(testUserB+RandSuffix(), e)
 
 	connA, err := net.Dial("tcp", "127.0.0.1:9090")
 	if err != nil {

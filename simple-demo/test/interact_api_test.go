@@ -50,7 +50,7 @@ func TestComment(t *testing.T) {
 	firstVideo := feedResp.Value("video_list").Array().First().Object()
 	videoId := firstVideo.Value("id").Number().Raw()
 
-	_, token := getTestUserToken(testUserA, e)
+	_, token := getTestUserToken("TestComment"+RandSuffix(), e)
 
 	addCommentResp := e.POST("/douyin/comment/action/").
 		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 1).WithQuery("comment_text", "测试评论").

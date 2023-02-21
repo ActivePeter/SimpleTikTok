@@ -1,7 +1,9 @@
 package test
 
 import (
+	"fmt"
 	"github.com/gavv/httpexpect/v2"
+	"math/rand"
 	"net/http"
 	"testing"
 )
@@ -9,6 +11,10 @@ import (
 var serverAddr = "http://192.168.31.86:8888"
 var testUserA = "douyinTestUserA"
 var testUserB = "douyinTestUserB"
+
+func RandSuffix() string {
+	return fmt.Sprintf("%v", rand.Intn(65536))
+}
 
 func newExpect(t *testing.T) *httpexpect.Expect {
 	return httpexpect.WithConfig(httpexpect.Config{

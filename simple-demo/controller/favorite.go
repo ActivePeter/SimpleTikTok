@@ -13,7 +13,7 @@ import (
 
 type VideosResponse struct {
 	StatusCode int32             `json:"status_code"`
-	VideoList  []dal.DetailVideo `json:"video_list,omitempty"`
+	VideoList  []dal.DetailVideo `json:"video_list"`
 }
 
 // FavoriteAction no practical effect, just check if token is valid
