@@ -7,10 +7,12 @@ import (
 )
 
 type ServerConfig struct {
-	SqlUser string
-	SqlPw   string
-	SqlAddr string
-	Schema  string
+	SqlUser   string
+	SqlPw     string
+	SqlAddr   string
+	Schema    string
+	RedisAddr string
+	RedisPw   string
 }
 
 func printConfigContent() {
@@ -33,10 +35,20 @@ func LoadConfig() (error, *ServerConfig) {
 	//return nil, nil
 	//fmt.Println("yaml 文件的内容: \n", string(dataBytes))
 	config := ServerConfig{}
-	err = yaml.Unmarshal(dataBytes, &config)
+	configmap := map[string]string{}
+	err = yaml.Unmarshal(dataBytes, &configmap)
 	if err != nil {
 		fmt.Println("解析 config.yaml 文件失败：", err)
 		return err, nil
 	}
+
+	config.SqlPw = configmap["SqlPw"]
+	config.SqlUser = configmap["SqlUser"]
+	config.SqlAddr = configmap["SqlAddr"]
+	config.Schema = configmap["Schema"]
+	config.RedisAddr = configmap["RedisAddr"]
+	config.RedisPw = configmap["RedisPw"]
+
+	//fmt.Printf("config:%+v\n", configmap)
 	return nil, &config
 }

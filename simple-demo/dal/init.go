@@ -25,7 +25,7 @@ func createTables() error {
 
 func Init(config *utils.ServerConfig) {
 	mysql.Init(config)
-	redisConfig.Init()
+	redisConfig.Init(config)
 	err := createTables()
 	if err != nil {
 		return

@@ -1,16 +1,17 @@
 package redisConfig
 
 import (
+	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/go-redis/redis"
 	"log"
 )
 
 var RD *redis.Client
 
-func Init() {
+func Init(config *utils.ServerConfig) {
 	RD = redis.NewClient(&redis.Options{
-		Addr:     "43.143.166.162:6379",
-		Password: "root",
+		Addr:     config.RedisAddr,
+		Password: config.RedisPw,
 		DB:       1,
 	})
 

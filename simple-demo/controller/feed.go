@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"github.com/RaymondCode/simple-demo/model"
 	"github.com/RaymondCode/simple-demo/service"
 	"github.com/RaymondCode/simple-demo/utils"
@@ -36,6 +37,7 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		Fail()
 		return
 	}
+	fmt.Printf("%v\n", req.LatestTime)
 	user, ok := service.GetUserFromContext(c)
 	uid := model.UserId(-1)
 	if ok {
