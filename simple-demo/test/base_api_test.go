@@ -65,9 +65,10 @@ func TestUserAction(t *testing.T) {
 
 func TestPublish(t *testing.T) {
 	e := newExpect(t)
-
+	testUserA = fmt.Sprintf("douyin%d", rand.Intn(65536))
 	userId, token := getTestUserToken(testUserA, e)
 
+	print("user publish ", userId)
 	publishResp := e.POST("/douyin/publish/action/").
 		WithMultipart().
 		WithFile("data", "../public/bear.mp4").

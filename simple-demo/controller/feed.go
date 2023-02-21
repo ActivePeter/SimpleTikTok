@@ -13,7 +13,7 @@ import (
 
 type FeedResponse struct {
 	model.Response
-	VideoList []model.Video `json:"video_list,omitempty"`
+	VideoList []model.Video `json:"video_list"`
 	NextTime  int64         `json:"next_time,omitempty"`
 }
 
