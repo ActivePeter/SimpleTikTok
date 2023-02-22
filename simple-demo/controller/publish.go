@@ -127,10 +127,12 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 	GetSnapshot("./public/video/"+finalName, "./public/photo/"+photoName, 1)
 
 	videoMeta := dal.VideoMeta{
-		Author:     user.Id,
-		CoverUrl:      "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
-		PlayUrl:    "https://www.w3schools.com/html/movie.mp4",//"./public/video/" + finalName,
-		// CoverUrl:   "./public/photo/" + photoName + ".png",
+		Author: user.Id,
+		//CoverUrl:    //  "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
+
+		PlayUrl://"https://www.w3schools.com/html/movie.mp4",
+		"public/video/" + finalName,
+		CoverUrl:   "public/photo/" + photoName + ".png",
 		Title:      title,
 		CreateTime: time.Now(),
 		UpdateTime: time.Now(),
