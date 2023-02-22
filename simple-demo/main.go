@@ -17,10 +17,12 @@ func main() {
 	}
 	go service.RunMessageServer()
 	dal.Init(config)
+	service.ServerDomain = config.ServerDomain
 	mw.InitJwt()
 	h := server.New(server.WithStreamBody(true))
-	fs := &app.FS{Root: "./public", PathRewrite: getPathRewriter("/videos")}
-	h.StaticFS("/videos", fs)
+
+	fs := &app.FS{Root: "./public", PathRewrite: getPathRewriter("/public")}
+	h.StaticFS("/public", fs)
 	initRouter(h)
 	h.Spin()
 }

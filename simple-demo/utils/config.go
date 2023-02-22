@@ -7,12 +7,13 @@ import (
 )
 
 type ServerConfig struct {
-	SqlUser   string
-	SqlPw     string
-	SqlAddr   string
-	Schema    string
-	RedisAddr string
-	RedisPw   string
+	SqlUser      string
+	SqlPw        string
+	SqlAddr      string
+	Schema       string
+	RedisAddr    string
+	RedisPw      string
+	ServerDomain string
 }
 
 func printConfigContent() {
@@ -48,6 +49,7 @@ func LoadConfig() (error, *ServerConfig) {
 	config.Schema = configmap["Schema"]
 	config.RedisAddr = configmap["RedisAddr"]
 	config.RedisPw = configmap["RedisPw"]
+	config.ServerDomain = configmap["ServerDomain"]
 
 	//fmt.Printf("config:%+v\n", configmap)
 	return nil, &config

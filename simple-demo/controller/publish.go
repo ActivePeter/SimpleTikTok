@@ -151,17 +151,21 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	user, _ := service.GetUserFromContext(c)
 	user_id := user.Id
-	if vedios, err := dal.GetViedoList(user_id); err != nil {
+	if videos, err := dal.GetViedoList(user_id); err != nil {
 		c.JSON(http.StatusBadRequest, model.Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
 		})
 	} else {
+		for i, _ := range videos {
+			videos[i].PlayUrl = "http://" + service.ServerDomain + videos[i].PlayUrl
+			videos[i].CoverUrl = "http://" + service.ServerDomain + videos[i].CoverUrl
+		}
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: model.Response{
 				StatusCode: 0,
 			},
-			VideoList: vedios,
+			VideoList: videos,
 		})
 	}
 }
