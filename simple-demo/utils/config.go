@@ -18,11 +18,18 @@ type ServerConfig struct {
 
 func printConfigContent() {
 	fmt.Printf(
-		"请在运行目录下创建 config.yaml,并填写内容:\n\n" +
-			"#数据库用户名\nsql_user:\n" +
-			"#数据库密码\nsql_pw:\n" +
-			"#数据库地址 如 1.1.1.1:3306, hhh.com:3306 \nsql_addr:\n" +
-			"schema:\n")
+		"#数据库用户名\n" +
+			"SqlUser: \n" +
+			"#数据库密码\n" +
+			"SqlPw: \n" +
+			"#数据库地址 如 1.1.1.1:3306, hhh.com:3306\n" +
+			"SqlAddr: \n" +
+			"Schema: \n" +
+			"#redis地址\n" +
+			"RedisAddr: \n" +
+			"#redis密码\n" +
+			"RedisPw: \n" +
+			"ServerDomain: \n")
 }
 func LoadConfig() (error, *ServerConfig) {
 	dataBytes, err := os.ReadFile("config.yaml")
