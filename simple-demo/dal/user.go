@@ -5,6 +5,21 @@ import (
 	"gorm.io/gorm"
 )
 
+func userFollowingCntQuery(tx *gorm.DB, userid ...model.UserId) *gorm.DB {
+	if len(userid) == 1 {
+		return tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=?", userid[0])
+	} else {
+		return tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id")
+	}
+}
+func userFollowerCntQuery(tx *gorm.DB, userid ...model.UserId) *gorm.DB {
+	if len(userid) == 1 {
+		return tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=?", userid[0])
+	} else {
+		return tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id")
+	}
+}
+
 // FindUserByUsername 用于注册账号时校验用户名是否唯一
 func FindUserByUsername(tx *gorm.DB, username string) (int64, error) {
 	tmp := model.User{}

@@ -36,8 +36,8 @@ func SelectFollows(tx *gorm.DB, fromId model.UserId) ([]model.User, error) {
 	var users []model.User
 	err := tx.Table("follow_relations").
 		Select("users.id,users.name,(?),(?)", //follow & follower cnt
-			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id"),
-			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=users.id"),
+			userFollowingCntQuery(tx),
+			userFollowerCntQuery(tx),
 		).
 		Where("follow_relations.from_id = ?", fromId).
 		Joins("left join users on to_id = users.id").Find(&users).Error
@@ -61,8 +61,8 @@ func SelectFollowers(tx *gorm.DB, toId model.UserId) ([]model.User, error) {
 	var users []model.User
 	err := tx.Table("follow_relations").
 		Select("users.id,users.name,(?),(?)",
-			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id"),
-			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=users.id")).
+			userFollowingCntQuery(tx),
+			userFollowerCntQuery(tx)).
 		Where("follow_relations.to_id = ?", toId).
 		Joins("left join users on from_id = users.id").Find(&users).Error
 	for i := 0; i < len(users); i++ {
@@ -111,8 +111,8 @@ func GetFriendList(tx *gorm.DB, fromId model.UserId) ([]model.User, error) {
 	//	"where a.from_id = ? " +
 	//	")"
 	if rows, err := tx.Model(User{}).Select("id,username name,(?),(?)",
-		tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id"),
-		tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=users.id"),
+		userFollowingCntQuery(tx),
+		userFollowerCntQuery(tx),
 	).
 		Where("id in (?)", tx.Raw("select a.to_id "+
 			"from follow_relations a "+

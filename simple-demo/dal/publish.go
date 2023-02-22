@@ -50,8 +50,10 @@ func GetViedoList(userid model.UserId) ([]model.Video, error) {
 				"exists (?),"+ //是否喜欢
 				"(?),"+ //喜爱数
 				"(?)", //评论数
-				tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=?", userid),
-				tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=?", userid),
+				userFollowingCntQuery(tx, userid),
+				userFollowerCntQuery(tx, userid),
+				//tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=?", userid),
+				//tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=?", userid),
 
 				tx.Model(&FavouriteRelation{}).
 					Where("user_id=? AND video_id=video_meta.id", userid),
