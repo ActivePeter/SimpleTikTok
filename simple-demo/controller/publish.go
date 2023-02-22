@@ -106,7 +106,7 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 	finalName := fmt.Sprintf("%d_%d%s", user.Id, laststVideoId+1, fileSuffix)
 	photoName := fmt.Sprintf("%d_%d", user.Id, laststVideoId+1)
 	fmt.Println(filename)
-	saveFile := filepath.Join("./public/video/", finalName)
+	saveFile := filepath.Join("./"+service.VideoRelateFsDir, finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, model.Response{
 			StatusCode: 1,
@@ -115,7 +115,7 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	//检测“视频“是否真的是视频文件
-	if isVideo("./public/video/"+finalName) != true {
+	if isVideo("./"+service.VideoRelateFsDir+finalName) != true {
 		c.JSON(http.StatusOK, model.Response{
 			StatusCode: 1,
 			StatusMsg:  "This file is not video!",
@@ -124,15 +124,15 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 	}
 
 	//截取视频第一帧作为封面
-	GetSnapshot("./public/video/"+finalName, "./public/photo/"+photoName, 1)
+	GetSnapshot("./"+service.VideoRelateFsDir+finalName, "./"+service.VideoCoverRelateFsDir+photoName, 1)
 
 	videoMeta := dal.VideoMeta{
 		Author: user.Id,
 		//CoverUrl:    //  "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
 
 		PlayUrl://"https://www.w3schools.com/html/movie.mp4",
-		"public/video/" + finalName,
-		CoverUrl:   "public/photo/" + photoName + ".png",
+		service.VideoReachRoot + "/video/" + finalName,
+		CoverUrl:   service.VideoReachRoot + "/photo/" + photoName + ".png",
 		Title:      title,
 		CreateTime: time.Now(),
 		UpdateTime: time.Now(),
@@ -151,16 +151,21 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	user, _ := service.GetUserFromContext(c)
 	user_id := user.Id
+	log.Printf("userid:%+v", user_id)
 	if videos, err := dal.GetViedoList(user_id); err != nil {
+		log.Printf("err:%+v", err)
 		c.JSON(http.StatusBadRequest, model.Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
 		})
 	} else {
-		for i, _ := range videos {
-			videos[i].PlayUrl = "http://" + service.ServerDomain + videos[i].PlayUrl
-			videos[i].CoverUrl = "http://" + service.ServerDomain + videos[i].CoverUrl
-		}
+		service.WrapVideoAndCover(&videos)
+
+		log.Printf("videos:%+v", videos)
+		//for i, _ := range videos {
+		//	videos[i].PlayUrl = "http://" + service.ServerDomain + videos[i].PlayUrl
+		//	videos[i].CoverUrl = "http://" + service.ServerDomain + videos[i].CoverUrl
+		//}
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: model.Response{
 				StatusCode: 0,

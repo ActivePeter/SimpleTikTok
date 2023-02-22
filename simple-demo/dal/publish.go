@@ -46,10 +46,13 @@ func GetViedoList(userid model.UserId) ([]model.Video, error) {
 			Joins("left join users on video_meta.author=users.id").
 			Where("video_meta.author=?", userid).
 			Select("video_meta.id, video_meta.author, video_meta.play_url, video_meta.cover_url,"+ //video
-				"users.id, users.name, users.follow_count, users.follower_count,"+ //author
+				"users.id, users.name, (?), (?),"+ //author
 				"exists (?),"+ //是否喜欢
 				"(?),"+ //喜爱数
 				"(?)", //评论数
+				tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=?", userid),
+				tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=?", userid),
+
 				tx.Model(&FavouriteRelation{}).
 					Where("user_id=? AND video_id=video_meta.id", userid),
 				tx.Model(&FavouriteRelation{}).

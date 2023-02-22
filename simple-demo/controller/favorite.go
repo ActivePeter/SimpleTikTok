@@ -53,10 +53,11 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 			StatusMsg:  "服务器出现错误",
 		})
 	} else {
-		for i, _ := range videos {
-			videos[i].PlayUrl = "http://" + service.ServerDomain + videos[i].PlayUrl
-			videos[i].CoverUrl = "http://" + service.ServerDomain + videos[i].CoverUrl
-		}
+		service.WrapVideoAndCover2(&videos)
+		//for i, _ := range videos {
+		//	videos[i].PlayUrl = "http://" + service.ServerDomain + videos[i].PlayUrl
+		//	videos[i].CoverUrl = "http://" + service.ServerDomain + videos[i].CoverUrl
+		//}
 		c.JSON(http.StatusOK, VideosResponse{
 			0,
 			videos,
