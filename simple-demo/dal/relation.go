@@ -35,7 +35,10 @@ func (*dAORelation) SetFollow(fromid model.UserId, toid model.UserId, follow boo
 func SelectFollows(tx *gorm.DB, fromId model.UserId) ([]model.User, error) {
 	var users []model.User
 	err := tx.Table("follow_relations").
-		Select("users.id,users.name,users.follow_count,users.follower_count").
+		Select("users.id,users.name,(?),(?)", //follow & follower cnt
+			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id"),
+			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=users.id"),
+		).
 		Where("follow_relations.from_id = ?", fromId).
 		Joins("left join users on to_id = users.id").Find(&users).Error
 	for i := 0; i < len(users); i++ {
@@ -44,19 +47,22 @@ func SelectFollows(tx *gorm.DB, fromId model.UserId) ([]model.User, error) {
 	return users, err
 }
 
+// 获取user follow 数量
 func SelectFollowsNum(tx *gorm.DB, fromId model.UserId) (int64, error) {
 	var count int64
 	err := tx.Table("follow_relations").
-		Select("users.id,users.name,users.follow_count,users.follower_count").
-		Where("follow_relations.from_id = ?", fromId).
-		Joins("left join users on to_id = users.id").Count(&count).Error
+		Select("*").
+		Where("follow_relations.from_id = ?", fromId).Count(&count).Error
 	return count, err
 }
 
+// 获取user follow 用户列表
 func SelectFollowers(tx *gorm.DB, toId model.UserId) ([]model.User, error) {
 	var users []model.User
 	err := tx.Table("follow_relations").
-		Select("users.id,users.name,users.follow_count,users.follower_count").
+		Select("users.id,users.name,(?),(?)",
+			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id"),
+			tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=users.id")).
 		Where("follow_relations.to_id = ?", toId).
 		Joins("left join users on from_id = users.id").Find(&users).Error
 	for i := 0; i < len(users); i++ {
@@ -71,9 +77,9 @@ func SelectFollowers(tx *gorm.DB, toId model.UserId) ([]model.User, error) {
 func SelectFollowersNum(tx *gorm.DB, toId model.UserId) (int64, error) {
 	var count int64
 	err := tx.Table("follow_relations").
-		Select("users.id,users.name,users.follow_count,users.follower_count").
+		Select("*").
 		Where("follow_relations.to_id = ?", toId).
-		Joins("left join users on from_id = users.id").Count(&count).Error
+		Count(&count).Error
 	return count, err
 }
 
@@ -93,18 +99,27 @@ func isFollow(tx *gorm.DB, fromId model.UserId, toId model.UserId) (bool, error)
 func GetFriendList(tx *gorm.DB, fromId model.UserId) ([]model.User, error) {
 	log.Default().Println("GetFriendList")
 	var users []model.User
-	sql := "select id,username name,follow_count,follower_count " +
-		"from users " +
-		"where id in " +
-		"(" +
-		"select a.to_id " +
-		"from follow_relations a " +
-		"join follow_relations b " +
-		"on a.from_id = b.to_id " +
-		"and a.to_id = b.from_id " +
-		"where a.from_id = ? " +
-		")"
-	if rows, err := tx.Raw(sql, fromId).Rows(); err != nil {
+	//sql := "select id,username name,(?),(?) " +
+	//	"from users " +
+	//	"where id in " +
+	//	"(" +
+	//	"select a.to_id " +
+	//	"from follow_relations a " +
+	//	"join follow_relations b " +
+	//	"on a.from_id = b.to_id " +
+	//	"and a.to_id = b.from_id " +
+	//	"where a.from_id = ? " +
+	//	")"
+	if rows, err := tx.Model(User{}).Select("id,username name,(?),(?)",
+		tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("from_id=users.id"),
+		tx.Model(&FollowRelation{}).Select("COUNT(from_id)").Where("to_id=users.id"),
+	).
+		Where("id in (?)", tx.Raw("select a.to_id "+
+			"from follow_relations a "+
+			"join follow_relations b "+
+			"on a.from_id = b.to_id "+
+			"and a.to_id = b.from_id "+
+			"where a.from_id = ? ", fromId)).Rows(); err != nil {
 		return nil, err
 	} else {
 		for rows.Next() {
