@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -43,6 +44,8 @@ func (*video) GetFeedList(userid model.UserId, after int64) (error, []model.Vide
 }
 
 func (*video) InitVideoFs(hertz *server.Hertz) {
+	os.MkdirAll("./public/video", os.ModePerm)
+	os.MkdirAll("./public/photo", os.ModePerm)
 	fs := &app.FS{Root: "./" + VideoStoreRoot, PathRewrite: getPathRewriter("/" + VideoReachRoot)}
 	hertz.StaticFS("/"+VideoReachRoot, fs)
 }
